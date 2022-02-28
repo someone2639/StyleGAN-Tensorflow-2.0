@@ -480,7 +480,7 @@ class StyleGAN(object):
         c1 = np.clip(c1, 0.0, 1.0)
         x = Image.fromarray(np.uint8(c1*255))
 
-        x.save("Results/single.png")
+        x.save(outPath)
 
     def saveModel(self, model, name, num):
         json = model.to_json()
@@ -565,8 +565,10 @@ class StyleGAN(object):
 
 
 
-
-
+def fujiwara_GenerateSingle(outPath):
+    model = StyleGAN(lr = 0.0001, silent = False)
+    model.load(0)
+    model.evaluateSingle(1, outPath)
 
 
 if __name__ == "__main__":
