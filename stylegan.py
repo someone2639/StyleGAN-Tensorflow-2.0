@@ -575,7 +575,7 @@ if __name__ == "__main__":
     model = StyleGAN(lr = 0.0001, silent = False)
     # model.evaluate(0)
     model.load(0)
-    model.evaluateSingle(1)
+    model.evaluateSingle(1, "Results/single.png")
 
     # while model.GAN.steps <= 1000001:
     #     model.train()
