@@ -48,7 +48,8 @@ class dataGenerator(object):
             print("Maximum Segment Size: ", self.segment_length)
 
         try:
-            os.mkdir("data/" + self.folder + "-npy-" + str(self.im_size))
+            os.system("mkdir -p " + "data/" + self.folder + "-npy-" + str(self.im_size))
+            # os.mkdir("~/Devel/fujiwara-filter/" + self.folder + "-npy-" + str(self.im_size))
         except:
             self.load_from_npy(folder)
             return

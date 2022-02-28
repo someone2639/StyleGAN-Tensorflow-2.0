@@ -14,10 +14,10 @@ import tensorflow.keras.backend as K
 
 from datagen import dataGenerator, printProgressBar
 
-im_size = 256
+im_size = 128
 latent_size = 512
 BATCH_SIZE = 12
-directory = "Earth"
+directory = "detectedFaces2"
 
 cha = 48
 
@@ -224,7 +224,7 @@ class GAN(object):
         x = g_block(x, inp_style[3], inp_noise, 4 * cha)  #32
         x = g_block(x, inp_style[4], inp_noise, 3 * cha)   #64
         x = g_block(x, inp_style[5], inp_noise, 2 * cha)   #128
-        x = g_block(x, inp_style[6], inp_noise, 1 * cha)   #256
+        # x = g_block(x, inp_style[6], inp_noise, 1 * cha)   #256
 
         x = Conv2D(filters = 3, kernel_size = 1, padding = 'same', kernel_initializer = 'he_normal')(x)
 
@@ -258,7 +258,9 @@ class GAN(object):
         for i in range(n_layers):
             inp_style.append(Input([latent_size]))
             style.append(self.SE(inp_style[-1]))
-            style[-1] = Lambda(lambda x: x * trunc)(style[-1])
+
+            yy = lambda x: x * trunc
+            style[-1] = yy(style[-1])
 
         inp_noise = Input([im_size, im_size, 1])
 
@@ -305,7 +307,7 @@ class StyleGAN(object):
 
         self.GAN.G.summary()
 
-        self.lastblip = time.clock()
+        self.lastblip = time.perf_counter()
 
         self.noise_level = 0
 
@@ -348,8 +350,8 @@ class StyleGAN(object):
             print("G:", np.array(b))
             print("GP:", self.gp_weight[0])
 
-            s = round((time.clock() - self.lastblip), 4)
-            self.lastblip = time.clock()
+            s = round((time.perf_counter() - self.lastblip), 4)
+            self.lastblip = time.perf_counter()
 
             steps_per_second = 100 / s
             steps_per_minute = steps_per_second * 60
@@ -458,7 +460,27 @@ class StyleGAN(object):
 
         x = Image.fromarray(np.uint8(c1*255))
 
-        x.save("Results/i"+str(num)+"-mr.png")
+        x.save("Results/i"+str(num)+".png")
+
+    def evaluateSingle(self, num = 0, trunc = 1.0):
+
+        n1 = noiseList(1)
+        n2 = nImage(1)
+        trunc = np.ones([1, 1]) * trunc
+
+
+        generated_images = self.GAN.GM.predict(n1 + [n2], batch_size = BATCH_SIZE)
+        print(generated_images)
+        r = []
+
+        for i in range(0, 1, 8):
+            r.append(np.concatenate(generated_images[i:i+8], axis = 1))
+
+        c1 = np.concatenate(r, axis = 0)
+        c1 = np.clip(c1, 0.0, 1.0)
+        x = Image.fromarray(np.uint8(c1*255))
+
+        x.save("Results/single.png")
 
     def saveModel(self, model, name, num):
         json = model.to_json()
@@ -549,7 +571,9 @@ class StyleGAN(object):
 
 if __name__ == "__main__":
     model = StyleGAN(lr = 0.0001, silent = False)
-    model.evaluate(0)
+    # model.evaluate(0)
+    model.load(0)
+    model.evaluateSingle(1)
 
-    while model.GAN.steps <= 1000001:
-        model.train()
+    # while model.GAN.steps <= 1000001:
+    #     model.train()
