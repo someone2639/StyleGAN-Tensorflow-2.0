@@ -565,17 +565,22 @@ class StyleGAN(object):
 
 
 
-def fujiwara_GenerateSingle(outPath):
-    model = StyleGAN(lr = 0.0001, silent = False)
-    model.load(0)
-    model.evaluateSingle(1, outPath)
+# def fujiwara_GenerateSingle(outPath):
+#     model = StyleGAN(lr = 0.0001, silent = False)
+#     model.load(0)
+#     model.evaluateSingle(1, outPath)
 
+import sys
 
 if __name__ == "__main__":
-    model = StyleGAN(lr = 0.0001, silent = False)
-    # model.evaluate(0)
-    model.load(0)
-    model.evaluateSingle(1, "Results/single.png")
+    if len(sys.argv) > 1:
+        model = StyleGAN(lr = 0.0001, silent = False)
+        # model.evaluate(0)
+        model.evaluateSingle(1, sys.argv[1])
+    else:
+        model = StyleGAN(lr = 0.0001, silent = False)
+        model.evaluate(0)
+        model.load(0)
+        while model.GAN.steps <= 1000001:
+            model.train()
 
-    # while model.GAN.steps <= 1000001:
-    #     model.train()
